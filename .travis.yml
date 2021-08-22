@@ -22,7 +22,7 @@ rust:
 services:
 - postgresql
 before_cache: |
-  cargo install cargo-tarpaulin
+  cargo install cargo-tarpaulin --avoid-cfg-tarpaulin
 before_script:
 - "if [ ! -z $PGVERSION ]; then sudo cp /etc/postgresql/{9.6,$PGVERSION}/main/pg_hba.conf; fi"
 - "if [ ! -z $PGVERSION ]; then sudo service postgresql restart $PGVERSION; fi"
