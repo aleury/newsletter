@@ -1,8 +1,12 @@
 use std::net::TcpListener;
 
+use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 
-use newsletter::configuration::{get_configuration, DatabaseSettings, Settings};
+use newsletter::{
+    configuration::{get_configuration, DatabaseSettings, Settings},
+    telemetry,
+};
 use uuid::Uuid;
 
 pub struct TestApp {
@@ -11,8 +15,25 @@ pub struct TestApp {
     pub settings: Settings,
 }
 
+static TRACING: Lazy<()> = Lazy::new(|| {
+    let default_filter_level = "info";
+    let subscriber_name = "test";
+
+    if std::env::var("TEST_LOG").is_ok() {
+        let subscriber =
+            telemetry::get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
+        telemetry::init_subscriber(subscriber);
+    } else {
+        let subscriber =
+            telemetry::get_subscriber(subscriber_name, default_filter_level, std::io::sink);
+        telemetry::init_subscriber(subscriber);
+    }
+});
+
 // Launch the application as a background task.
 async fn spawn_app() -> TestApp {
+    Lazy::force(&TRACING);
+
     let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind to random port");
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
@@ -61,11 +82,11 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
 async fn stop_app(app: TestApp) {
     app.db_pool.close().await;
 
+    // Delete database
     let config = &app.settings.database;
     let mut connection = PgConnection::connect(&config.connection_string_without_db())
         .await
         .expect("failed to connect to database");
-    // Delete database
     connection
         .execute(&*format!(r#"DROP DATABASE"{}";"#, config.database_name))
         .await
