@@ -34,7 +34,6 @@ before_script:
 - cargo install --vers 0.5.7 sqlx-cli --no-default-features --features postgres
 - sqlx database create
 - sqlx migrate run
-- cp ./ci/config.yaml config.yaml
 - rustup component add rustfmt
 - rustup component add clippy
 - cargo install cargo-audit
