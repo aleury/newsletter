@@ -11,7 +11,7 @@ env:
   global:
   - PGPORT=5433
   - PGUSER=travis
-  - DATABASE_URL="postgres://travis:@127.0.0.1:5433/newsletter"
+  - DATABASE_URL="postgres://travis@localhost:5433/newsletter"
 cache: cargo
 rust:
 - stable

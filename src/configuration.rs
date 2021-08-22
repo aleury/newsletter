@@ -31,8 +31,6 @@ impl DatabaseSettings {
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let mut settings = config::Config::default();
-
     settings.merge(config::File::with_name("config"))?;
-
     settings.try_into()
 }
