@@ -8,7 +8,7 @@ FROM rust:1.54.0 AS cacher
 WORKDIR /app
 RUN cargo install cargo-chef
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chefdoc cook --release --recipe-path recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 
 FROM rust:1.54.0 AS builder
 WORKDIR /app
