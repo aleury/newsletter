@@ -1,20 +1,26 @@
 language: rust
 dist: bionic
 addons:
+  postgresql: "11"
   apt:
     packages:
     - libssl-dev
+    - postgresql-11
+    - postgresql-client-11
+env:
+  global:
+  - PGPORT=5433
+  - PGUSER=travis
+  - DATABASE_URL="postgres://travis:@127.0.0.1:5433/newsletter"
 cache: cargo
 rust:
 - stable
 services:
 - postgresql
-env:
-- DATABASE_URL="postgres://postgres:@127.0.0.1:5432/newsletter"
 before_cache: |
   cargo install cargo-tarpaulin
 before_script:
-- psql -c 'create database newsletter;' -U postgres
+- psql -c 'create database newsletter;' -U travis -p 5433
 - rustup component add rustfmt
 - rustup component add clippy
 - cargo install cargo-audit
