@@ -57,18 +57,21 @@ async fn spawn_app() -> TestApp {
     }
 }
 
-async fn configure_database(config: &DatabaseSettings) -> PgPool {
+async fn configure_database(settings: &DatabaseSettings) -> PgPool {
     // Create database
-    let mut connection = PgConnection::connect(&config.connection_string_without_db())
+    let mut connection = PgConnection::connect_with(&settings.without_db())
         .await
         .expect("failed to connect to database");
     connection
-        .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.database_name))
+        .execute(&*format!(
+            r#"CREATE DATABASE "{}";"#,
+            settings.database_name
+        ))
         .await
         .expect("failed to create existing test database");
 
     // Migrate database
-    let connection_pool = PgPool::connect(&config.connection_string())
+    let connection_pool = PgPool::connect_with(settings.with_db())
         .await
         .expect("failed to connect to postgres");
     sqlx::migrate!("./migrations")
@@ -83,12 +86,12 @@ async fn stop_app(app: TestApp) {
     app.db_pool.close().await;
 
     // Delete database
-    let config = &app.settings.database;
-    let mut connection = PgConnection::connect(&config.connection_string_without_db())
+    let settings = &app.settings.database;
+    let mut connection = PgConnection::connect_with(&settings.without_db())
         .await
         .expect("failed to connect to database");
     connection
-        .execute(&*format!(r#"DROP DATABASE"{}";"#, config.database_name))
+        .execute(&*format!(r#"DROP DATABASE"{}";"#, settings.database_name))
         .await
         .expect("failed to drop existing test database");
 }

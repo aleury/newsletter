@@ -1,0 +1,11 @@
+application:
+  host: 127.0.0.1
+  port: 8000
+database:
+  host: "localhost"
+  port: 5433
+  username: "travis"
+  password: ""
+  database_name: "newsletter"
+  require_ssl: false
+  

@@ -18,6 +18,7 @@ env:
   - PGPORT=5433
   - PGUSER=travis
   - PGVERSION=11
+  - APP_ENVIRONMENT=ci
   - DATABASE_URL="postgres://travis@localhost:5433/newsletter"
 cache: cargo
 rust:
@@ -43,6 +44,7 @@ before_script:
 script: |
   cargo fmt --all -- --check &&
   cargo clippy -- -D warnings &&
+  cargo sqlx prepare --check -- --bin newsletter &&
   cargo build &&
   cargo test &&
   cargo audit

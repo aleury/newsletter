@@ -1,7 +1,4 @@
 .env
 .vscode
-config.yaml
-!ci/*
-
 /target
 

@@ -1,0 +1,13 @@
+# files
+.env
+.gitignore
+.travis.yml
+codecov.yml
+Dockerfile
+
+# directories
+design/
+migrations/
+target/
+tests/
+.vscode/
