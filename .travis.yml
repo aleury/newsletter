@@ -1,5 +1,5 @@
 language: rust
-dist: bionic
+dist: xenial
 addons:
   postgresql: "11"
   apt:
