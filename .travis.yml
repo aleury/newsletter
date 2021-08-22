@@ -7,10 +7,14 @@ addons:
     - libssl-dev
     - postgresql-11
     - postgresql-client-11
+    - postgresql-server-dev-11
+    - postgresql-client-common
+    - postgresql-common
 env:
   global:
   - PGPORT=5433
   - PGUSER=travis
+  - PGVERSION=11
   - DATABASE_URL="postgres://travis@localhost:5433/newsletter"
 cache: cargo
 rust:
@@ -20,6 +24,9 @@ services:
 before_cache: |
   cargo install cargo-tarpaulin
 before_script:
+- "if [ ! -z $PGVERSION ]; then sudo cp /etc/postgresql/{9.6,$PGVERSION}/main/pg_hba.conf; fi"
+- "if [ ! -z $PGVERSION ]; then sudo service postgresql restart $PGVERSION; fi"
+- sh -c 'until pg_isready -p 5433; do echo "Waiting for the DB to be up..."; sleep 2; done'
 - psql -c 'create database newsletter;' -U travis -p 5433
 # - rustup component add rustfmt
 # - rustup component add clippy
